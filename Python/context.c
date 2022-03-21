@@ -9,6 +9,7 @@
 #include "pycore_pystate.h"       // _PyThreadState_GET()
 #include "structmember.h"         // PyMemberDef
 
+#include <stdio.h>
 
 #include "clinic/context.c.h"
 /*[clinic input]
@@ -609,6 +610,28 @@ _contextvars_Context_items_impl(PyContext *self)
     return _PyHamt_NewIterItems(self->ctx_vars);
 }
 
+static PyObject *
+_contextvars_Context_current_impl()
+{
+    printf("Hello, world\n");
+    PyThreadState *ts = _PyThreadState_GET();
+    printf("ThreadState: %p\n", ts);
+    assert(ts != NULL);
+
+    printf("There. Context: %p\n", ts->context);
+
+    if (ts->context == NULL) {
+        Py_RETURN_NONE;
+    }
+
+    // TODO: Is this incref correct?
+    Py_INCREF(ts->context);
+
+    printf("Here\n");
+
+    return ts->context;
+}
+
 
 /*[clinic input]
 _contextvars.Context.keys
@@ -680,6 +703,7 @@ context_run(PyContext *self, PyObject *const *args,
 
 
 static PyMethodDef PyContext_methods[] = {
+    _CONTEXTVARS_CONTEXT_CURRENT_METHODREF
     _CONTEXTVARS_CONTEXT_GET_METHODDEF
     _CONTEXTVARS_CONTEXT_ITEMS_METHODDEF
     _CONTEXTVARS_CONTEXT_KEYS_METHODDEF

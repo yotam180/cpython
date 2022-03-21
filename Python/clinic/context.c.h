@@ -11,12 +11,25 @@ PyDoc_STRVAR(_contextvars_Context_get__doc__,
 "If `key` does not exist, return `default`. If `default` is not given,\n"
 "return None.");
 
+PyDoc_STRVAR(_contextvars_Context_current__doc__,
+"current()\n"
+"--\n"
+"\n"
+"Return the current context object.\n"
+);
+
 #define _CONTEXTVARS_CONTEXT_GET_METHODDEF    \
     {"get", (PyCFunction)(void(*)(void))_contextvars_Context_get, METH_FASTCALL, _contextvars_Context_get__doc__},
+
+#define _CONTEXTVARS_CONTEXT_CURRENT_METHODREF  \
+    {"current", (PyCFunction)(void(*)(void))_contextvars_Context_current, METH_NOARGS | METH_STATIC, _contextvars_Context_current__doc__},
 
 static PyObject *
 _contextvars_Context_get_impl(PyContext *self, PyObject *key,
                               PyObject *default_value);
+
+static PyObject *
+_contextvars_Context_current_impl(void);
 
 static PyObject *
 _contextvars_Context_get(PyContext *self, PyObject *const *args, Py_ssize_t nargs)
@@ -38,6 +51,12 @@ skip_optional:
 
 exit:
     return return_value;
+}
+
+static PyObject *
+_contextvars_Context_current(PyObject *module, PyObject *Py_UNUSED(ignored))
+{
+    return _contextvars_Context_current_impl();
 }
 
 PyDoc_STRVAR(_contextvars_Context_items__doc__,
